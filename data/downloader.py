@@ -38,6 +38,7 @@ def make_session():
     })
     return session
 
+
 def download_pdfs(json_path):
     # derive output dir: <basename>_pdf
     base_name = os.path.splitext(os.path.basename(json_path))[0]
@@ -45,6 +46,7 @@ def download_pdfs(json_path):
     os.makedirs(output_dir, exist_ok=True)
     sess = make_session()
 
+    seen_ids = set()
     with open(json_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
@@ -63,6 +65,12 @@ def download_pdfs(json_path):
                 logging.warning("Missing id/pdf, skipping")
                 continue
 
+            # skip duplicate IDs
+            if paper_id in seen_ids:
+                logging.info(f"[{paper_id}] duplicate entry, skipping.")
+                continue
+            seen_ids.add(paper_id)
+
             out_path = os.path.join(output_dir, f"{paper_id}.pdf")
             if os.path.exists(out_path):
                 logging.info(f"[{paper_id}] already exists, skipping.")
@@ -78,8 +86,7 @@ def download_pdfs(json_path):
                     logging.info(f"[{paper_id}] saved to {out_path}")
                 else:
                     logging.error(
-                        f"[{paper_id}] failed: HTTP {resp.status_code}, "
-                        f"Content-Type={ct}"
+                        f"[{paper_id}] failed: HTTP {resp.status_code}, Content-Type={ct}"
                     )
             except requests.RequestException as e:
                 logging.error(f"[{paper_id}] exception: {e}")
@@ -88,6 +95,7 @@ def download_pdfs(json_path):
             delay = random.uniform(MIN_DELAY, MAX_DELAY)
             logging.debug(f"Sleeping for {delay:.2f}s")
             time.sleep(delay)
+
 
 def main():
     parser = argparse.ArgumentParser(
