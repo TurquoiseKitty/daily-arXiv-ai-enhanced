@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Base name (no spaces around =)
-date="2025-05-25"
+date="2025-05-26"
 
 # Download PDFs
 python downloader.py "${date}.jsonl"
