@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Base name (no spaces around =)
-date="2025-05-26"
+date="2025-05-27"
 
-# Download PDFs
+# 1) Download PDFs
 python downloader.py "${date}.jsonl"
 
-# Extract affiliations & mark preferences
+# 2) Extract affiliations & mark preferences
 python affiliation_extract.py "${date}_pdf" "${date}.jsonl"
 
-# Remove the PDF folder when done
-if [ -d "${date}_pdf" ]; then
-  rm -rf "${date}_pdf"
-fi
+# 3) Keep only the selected PDFs (delete the rest)
+python filter_pdfs.py "${date}_pdf" "${date}_chosen_affiliation.jsonl"
+
+echo "Done. Only selected PDFs remain in ${date}_pdf."
