@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-date="2025-05-27"
+date="2025-05-28"
 
 # 1) Download PDFs
 python downloader.py "${date}.jsonl"
